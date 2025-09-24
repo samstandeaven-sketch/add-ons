@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your Aircall Solution</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #06AB78 0%, #05956a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 100%;
+            width: 100%;
+            min-height: 400px;
+            max-height: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #012635;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card h3 {
+            color: #012635;
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            color: #495057;
+            line-height: 1.4;
+        }
+
+        .option:hover {
+            border-color: #06AB78;
+            background: rgba(6, 171, 120, 0.05);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Product-specific result cards */
+        .result-card {
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .result-ai-assist, .result-ai-assist-pro {
+            background: #005ABB; 
+        }
+
+        .result-analytics {
+            background: #00BD82; 
+        }
+
+        .result-whatsapp {
+            background: #06AB78; /* UPDATED COLOR */
+        }
+
+        .result-voice-agent {
+            background: #073F56; 
+        }
+
+        .result-card.active {
+            display: block;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .result-card .addon-name {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 10px;
+            margin: 12px 0;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .result-card p {
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .result-card .button-group {
+            margin-top: 20px;
+        }
+
+        .cta-btn {
+            background: white;
+            color: #012635;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 5px;
+        }
+
+        .cta-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .restart-btn {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .restart-btn:hover {
+            background: white;
+            color: #012635;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 3px;
+            border-radius: 2px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #06AB78, #05956a);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+            
+            .question-card h3 {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Find Your Aircall Solution</h1>
+            <p>Answer a few questions to discover which of our features will solve your biggest challenges</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <button class="back-btn" id="backBtn" onclick="goBack()">← Back</button>
+
+        <div class="question-card active" id="q1">
+            <h3>What's your biggest challenge with your current phone system?</h3>
+            <div class="options">
+                <div class="option" onclick="nextQuestion(2, 25)">
+                    Getting actionable insights from call data
+                </div>
+                <div class="option" onclick="nextQuestion(3, 25)">
+                    Coaching and improving team performance
+                </div>
+                <div class="option" onclick="nextQuestion(4, 25)">
+                    Managing high call volumes efficiently
+                </div>
+                <div class="option" onclick="nextQuestion(5, 25)">
+                    Integrating with our existing tools and workflows
+                </div>
+                <div class="option" onclick="showResult('whatsapp', 100)">
+                    Communicating with customers on their preferred messaging app
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q2">
+            <h3>What kind of insights are you looking for?</h3>
+            <div class="options">
+                <div class="option" onclick="showResult('analytics_plus', 100)">
+                    Deep historical reporting and custom dashboards
+                </div>
+                <div class="option" onclick="showResult('ai_assist_pro', 100)">
+                    AI-powered call analysis and coaching insights
+                </div>
+                <div class="option" onclick="showResult('analytics_plus', 100)">
+                    Advanced filtering and drill-down capabilities
+                </div>
+                <div class="option" onclick="showResult('ai_assist', 100)">
+                    Basic call summaries and sentiment analysis
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q3">
+            <h3>How do you want to improve team performance?</h3>
+            <div class="options">
+                <div class="option" onclick="showResult('ai_assist_pro', 100)">
+                    Advanced coaching with custom scorecards and playbooks
+                </div>
+                <div class="option" onclick="showResult('ai_assist', 100)">
+                    Basic call summaries and key moment identification
+                </div>
+                <div class="option" onclick="showResult('analytics_plus', 100)">
+                    Detailed performance metrics and KPIs
+                </div>
+                <div class="option" onclick="showResult('ai_assist_pro', 100)">
+                    Comprehensive AI-driven conversation analysis
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q4">
+            <h3>What communication channels do you need?</h3>
+            <div class="options">
+                <div class="option" onclick="showResult('whatsapp', 100)">
+                    WhatsApp messaging for customer support
+                </div>
+                <div class="option" onclick="showResult('voice_agent', 100)">
+                    Automated voice interactions and call handling
+                </div>
+                <div class="option" onclick="showResult('analytics_plus', 100)">
+                    Better reporting across all existing channels
+                </div>
+                <div class="option" onclick="showResult('ai_assist_pro', 100)">
+                    Advanced AI analysis across all channels
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q5">
+            <h3>What level of AI capabilities do you need?</h3>
+            <div class="options">
+                <div class="option" onclick="showResult('ai_assist', 100)">
+                    Basic AI summaries and call insights
+                </div>
+                <div class="option" onclick="showResult('ai_assist_pro', 100)">
+                    Advanced AI coaching, scorecards, and custom playbooks
+                </div>
+                <div class="option" onclick="showResult('voice_agent', 100)">
+                    Fully automated voice interactions
+                </div>
+                <div class="option" onclick="showResult('analytics_plus', 100)">
+                    Focus on data analysis rather than AI features
+                </div>
+            </div>
+        </div>
+
+        <div class="result-card result-ai-assist" id="ai_assist">
+            <h3>AI Assist</h3>
+            <div class="addon-name">Essential AI-powered insights</div>
+            <p><strong>Perfect for:</strong> Teams that want to get started with AI call analysis, automatic summaries, and basic sentiment insights without complexity.</p>
+            <p><strong>Key benefits:</strong> Automated call summaries, sentiment analysis, key moment identification, and essential conversation insights.</p>
+            <div class="button-group">
+                <button class="cta-btn" onclick="window.open('https://aircall.io/products/ai/', '_blank')">Learn More</button>
+                <button class="cta-btn" onclick="window.open('https://aircall.io/getting-started-ai-assist-pro/', '_blank')">Request Demo</button>
+                <button class="cta-btn restart-btn" onclick="goBackFromResults()">← Go Back</button>
+            </div>
+        </div>
+
+        <div class="result-card result-ai-assist-pro" id="ai_assist_pro">
+            <h3>AI Assist Pro</h3>
+            <div class="addon-name">Advanced AI coaching and analysis</div>
+            <p><strong>Perfect for:</strong> Teams that need comprehensive AI-driven coaching with custom scorecards, playbooks, and advanced conversation intelligence.</p>
+            <p><strong>Key benefits:</strong> Custom scorecards, coaching playbooks, advanced sentiment analysis, conversation intelligence, and detailed performance insights.</p>
+            <div class="button-group">
+                <button class="cta-btn" onclick="window.open('https://aircall.io/products/ai/', '_blank')">Learn More</button>
+                <button class="cta-btn" onclick="window.open('https://aircall.io/getting-started-ai-assist-pro/', '_blank')">Request Demo</button>
+                <button class="cta-btn restart-btn" onclick="goBackFromResults()">← Go Back</button>
+            </div>
+        </div>
+
+        <div class="result-card result-analytics" id="analytics_plus">
+            <h3>Analytics+</h3>
+            <div class="addon-name">Advanced reporting and insights</div>
+            <p><strong>Perfect for:</strong> Organizations that need deeper insights into their call data with unlimited history, advanced filtering, and powerful drill-down capabilities.</p>
+            <p><strong>Key benefits:</strong> Unlimited historical data, custom dashboards, advanced filtering, and comprehensive business intelligence.</p>
+            <div class="button-group">
+                <button class="cta-btn" onclick="window.open('#', '_blank')">Learn More</button>
+                <button class="cta-btn" onclick="window.open('#', '_blank')">Request Demo</button>
+                <button class="cta-btn restart-btn" onclick="goBackFromResults()">← Go Back</button>
+            </div>
+        </div>
+
+        <div class="result-card result-whatsapp" id="whatsapp">
+            <h3>WhatsApp</h3>
+            <div class="addon-name">WhatsApp business messaging</div>
+            <p><strong>Perfect for:</strong> Businesses that want to provide customer support and engagement through WhatsApp, reaching customers on their preferred messaging platform.</p>
+            <p><strong>Key benefits:</strong> Native WhatsApp integration, unified inbox, rich media support, and seamless agent handoffs.</p>
+            <div class="button-group">
+                <button class="cta-btn" onclick="window.open('https://aircall.io/products/whatsapp-in-aircall/', '_blank')">Learn More</button>
+                <button class="cta-btn" onclick="window.open('https://aircall.io/get-started-messaging/', '_blank')">Request Demo</button>
+                <button class="cta-btn restart-btn" onclick="goBackFromResults()">← Go Back</button>
+            </div>
+        </div>
+
+        <div class="result-card result-voice-agent" id="voice_agent">
+            <h3>AI Voice Agent</h3>
+            <div class="addon-name">Automated voice interactions</div>
+            <p><strong>Perfect for:</strong> Teams handling high volumes of routine inquiries who want to provide 24/7 support while freeing up agents for complex conversations.</p>
+            <p><strong>Key benefits:</strong> Handle routine inquiries automatically, provide round-the-clock availability, and seamlessly escalate to human agents when needed.</p>
+            <div class="button-group">
+                <button class="cta-btn" onclick="window.open('https://aircall.io/products/ai/voice-agent/', '_blank')">Learn More</button>
+                <button class="cta-btn" onclick="window.open('https://aircall.io/get-started-ai/', '_blank')">Request Demo</button>
+                <button class="cta-btn restart-btn" onclick="goBackFromResults()">← Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let questionHistory = [];
+        let lastActiveResultId = null; // To track the current result card
+
+        function nextQuestion(questionNumber, progress) {
+            document.getElementById('q' + currentQuestion).classList.remove('active');
+            questionHistory.push(currentQuestion);
+            currentQuestion = questionNumber;
+            document.getElementById('q' + questionNumber).classList.add('active');
+            updateProgress(progress);
+            document.getElementById('backBtn').style.display = 'block';
+        }
+
+        function showResult(resultId, progress) {
+            // If coming from the first question, don't push to history
+            if (currentQuestion !== 1) {
+                questionHistory.push(currentQuestion);
+            }
+            document.getElementById('q' + currentQuestion).classList.remove('active');
+            document.getElementById(resultId).classList.add('active');
+            updateProgress(progress);
+            document.getElementById('backBtn').style.display = 'none';
+            lastActiveResultId = resultId; // Store which result is shown
+        }
+
+        function updateProgress(percentage) {
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        function goBack() {
+            if (questionHistory.length > 0) {
+                document.getElementById('q' + currentQuestion).classList.remove('active');
+                currentQuestion = questionHistory.pop();
+                document.getElementById('q' + currentQuestion).classList.add('active');
+                updateProgress((questionHistory.length) * 25);
+                if (questionHistory.length === 0) {
+                    document.getElementById('backBtn').style.display = 'none';
+                }
+            }
+        }
+
+        function goBackFromResults() {
+            if (!lastActiveResultId) return;
+
+            // Hide the current result card
+            document.getElementById(lastActiveResultId).classList.remove('active');
+            lastActiveResultId = null;
+
+            // Determine the previous question. If history is empty, it was Q1.
+            let previousQuestionId = questionHistory.length > 0 ? questionHistory.pop() : 1;
+            currentQuestion = previousQuestionId;
+
+
+            // Show the previous question card
+            document.getElementById('q' + currentQuestion).classList.add('active');
+
+            // Update the progress bar and show the main back button if not back to Q1
+            updateProgress((questionHistory.length) * 25);
+            if (questionHistory.length > 0) {
+                 document.getElementById('backBtn').style.display = 'block';
+            }
+        }
+
+        function restart() {
+            const results = document.querySelectorAll('.result-card');
+            results.forEach(result => result.classList.remove('active'));
+            currentQuestion = 1;
+            questionHistory = [];
+            lastActiveResultId = null;
+            document.getElementById('q1').classList.add('active');
+            updateProgress(0);
+            document.getElementById('backBtn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
